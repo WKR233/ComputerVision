@@ -1,0 +1,396 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath}
+%\input{definitions}
+
+\renewcommand{\baselinestretch}{1.2}
+\setlength{\topmargin}{-0.25in}
+\setlength{\oddsidemargin}{0.50in}
+\setlength{\textwidth}{5.9in}
+\setlength{\textheight}{8.5in}
+
+\newcommand{\I}{{\bf I}}
+%\input{psfig}
+
+\begin{document}
+
+\begin{center}
+{\bf Computer Vision I: Low-Middle Level Vision  Homework Exercise \#1 }  \\ (total 15 points)   \\
+Due: October 31, 2024 11:59 PM.
+\end{center}
+
+\vspace{5mm}
+
+These questions are designed for refreshing  math you learned in calculus and  understanding the topics discussed in class. They are divided into smaller steps for you to walk through.   Each step needs no more than 5 lines of proof, so don't get too complicated.  
+{\em Remark: There are 4 questions in total }
+
+\vspace{5mm}
+
+\noindent{\bf Question 1}. (4 points) This exercise shows that the 1/f-power law
+observed in natural images can be explained by a simple Markov Random Field MRF model.  \\
+
+ Let $\I$ be an image  in a continuous 2D plane (It is neat to prove this in continuous form, discrete lattice will be messy), its Fourier
+transform is,
+\[
+      F(\I) = \hat{I}(\xi,\eta) = \int\int \I(x,y) e^{-i2\pi (x \xi +
+      y\eta)} dxdy.
+\]
+$A^2(\xi, \eta) = |\hat{I}(\xi,\eta)|^2$ is the ``power'' of the
+signal at frequency component $(\xi,\eta)$. We consider a MRF model
+with a quadratic potential $H(\I)$.
+\[
+    p(\I)=\frac{1}{Z} e^{-H(\I)}, \quad H(\I)=\beta \int\int
+    (\nabla_x\I(x,y))^2+(\nabla_y\I(x,y))^2 dxdy.
+\]
+where $\nabla_x \I(x,y)=\frac{\partial \I(x,y)}{\partial x}$ and
+$\nabla_y \I(x,y)=\frac{\partial \I(x,y)}{\partial y}$ are the gradient images. For boundary
+condition,  the image $\I(x,y)$ is assumed to have zero intensity at
+infinity or to be defined on a torus.
+
+\begin{enumerate}
+\item Show the Fourier transform of two gradient images
+$\nabla_x\I(x,y)$ and $\nabla_x\I(x,y)$ are $2\pi i \xi \hat{I}$ and
+$2\pi i \eta \hat{I}$ respectively.  That is,
+\[
+   F(\nabla_x\I) = 2\pi i \xi \hat{I}, \quad  F(\nabla_y\I) = 2\pi i \eta \hat{I}.
+\]
+(Hint: this is the so-called Integration by Part in calculus).
+
+\textbf{Answer:}
+$$
+\begin{aligned}
+	F(\nabla_x \I) & = \int\int \nabla_x \I(x,y) e^{-i2\pi (x \xi + y\eta)} dxdy \\
+	& = \int\int \frac{\partial \I(x,y)}{\partial x} e^{-i2\pi (x \xi + y\eta)} dxdy \\
+	& = \int\int \frac{\partial }{\partial x} (\I(x,y)e^{-i2\pi (x \xi + y\eta)}) dxdy - \int\int  \I(x,y) \frac{\partial }{\partial x}e^{-i2\pi (x \xi + y\eta)} dxdy \\
+	& = \int \I(x,y) e^{-i2\pi(x\xi + y\eta)}|^{x=\infty}_{x=-\infty} dy + i2\pi\xi\int\int \I(x,y)e^{-i2\pi (x \xi + y\eta)}dxdy
+\end{aligned}
+$$
+because $\I(x,y)$ is assumed to have zero intensity at
+infinity, so the first item is supposed to be zero, and the equation becomes
+$$
+ F(\nabla_x \I) = 2i\pi\xi \int\int \I(x,y)e^{-i2\pi (x \xi + y\eta)}dxdy = 2\pi i \xi \hat{I}
+$$
+It's same for $y$, so the two equations are proved.
+
+\item Show that for any function $g(t)$ and its Fourier transform $G(\xi)$, we have
+\[
+      \int g(t)^2 dt = \int G(\xi)^\ast G(\xi) d\xi
+\]
+$G(\xi)^\ast$ is the conjugate of $G(\xi)$ (as it is a complex number). Intuitively, the Fourier transform does not change the norm of a vector or function. (Hint: The proof involves switching the order of integration variables.)
+
+\textbf{Answer:}
+$$
+\begin{aligned}
+	RHS & = \int G^*(\xi)G(\xi) \\
+	& = \int G^*(\xi)\left[\int g(t)e^{-i2\pi t\xi}dt\right]d\xi \\
+	& = \int g(t) \left[\int G^*(\xi)e^{-i2\pi t\xi}d\xi\right]dt \\
+	& = \int g(t)g(-t)dt \\
+	& = \int g(t)g^*(t)dt \\
+\end{aligned}
+$$
+because $g(t)$ here is real, so RHS is just $\int g(t)^2 dt$, and the equation is proved.
+\item By combining the previous two steps, show
+\[
+       H(\I) = 4 \pi^2 \beta \int\int (\xi^2 + \eta^2)
+       |\hat{I}(\xi,\eta)|^2 d\xi d\eta.
+\]
+What is the mean and variance for each component $\hat{I}(\xi,\eta)$?
+
+\textbf{Answer:}
+Using the conclusion in section 2 we got
+$$
+\begin{aligned}
+	H(\I) = \beta \int\int \textbf{F}\textbf{F}^*d\xi d\eta
+\end{aligned}
+$$
+where $\textbf{F}$ is the Fourier transform of $\nabla_x \I + \nabla_y \I$, and with section 1, $\textbf{F}$ can be rewrite as
+$$
+\textbf{F} = 2\pi i\xi \hat{I} + 2\pi i\eta \hat{I}
+$$
+so the modulus of $\textbf{F}$ is $4\pi^2(\xi^2 + \eta^2)|\hat{I}|^2$, and thus we have
+$$
+H(\I) = 4\pi^2\beta \int\int (\xi^2+\eta^2)|\hat{I}(\xi,\eta)|^2d\xi d\eta
+$$
+with the probability of MRF model, we can get PDF:
+$$
+p(\hat{I}(\xi,\eta))=\frac{1}{Z}e^{-4\pi^2\beta(\xi^2+\eta^2)|\hat{I}(\xi,\eta)|^2}
+$$
+$$
+E(\hat{I}(\xi,\eta))=\int \hat{I}p(\hat{I})d\hat{I} = 0
+$$
+$$
+Var(\hat{I})=E(\hat{I}^2)=\frac{1}{8\pi^2\beta(\xi^2+\eta^2)}
+$$
+{\em Remark: In $\I$, each pixel intensity $\I(x,y)$ is correlated with
+each its neighbours, now in $\hat{I}$, each component $\hat{I}(\xi,\eta)$ is
+independent of other component $\hat{I}(\xi^\prime,\eta^\prime)$. it is like to be diagonalized in discrete covariance matrix in lecture.
+
+Therefore the variance of each Fourier component $\hat{I}(\xi,\eta)$ is
+\[
+  E_p[|\hat{I}(\xi,\eta)|^2] = \frac{C}{\xi^2 + \eta^2}
+\]
+Then  we see that $A(f)$ follows the 1/f law, where $f=\sqrt{\xi^2 +\eta^2}$ is the frequency. 
+}
+
+\item  Derive the constant $C$ above, and prove that the image has constant power $A^2(f)$ at each frequency band $[f, 2f]$, as you observed in project 1.
+Explain in plain language why images in this ensemble have invariant expected power-spectrum over scales
+(frequency bands).
+
+\textbf{Answer:}
+C is shown above.
+$$
+f^2 =\xi^2+\eta^2, A^2(f) = E[\hat{I}^2(\xi,\eta)]\propto\frac{1}{f^2} 
+$$
+$$
+\int\int_{f^2\leq\xi^2+\eta^2\leq4f^2}|\hat{I}(\xi,\eta)|d\xi d\eta\propto\int_{f^2}^{4f^2}\frac{1}{f^2}df^2=constant
+$$
+This is because of the GMRF model.
+
+\end{enumerate}
+{\em Remark. This problem shows that the image ensemble defined by the MRF model $p(\I)$ above has exact 1/f power.   As we will show in lecture, it is a maximum entropy probability, it observes the 1/f-law as its sufficient statistics !}
+
+\vspace{0.5cm}
+
+
+\noindent{\bf Question 2} (3  points). The goal of this exercise is to show the connection between the Gibbs/MRF model and partial differential equations (PDEs) for image processing.   Consider the continuous Gibbs/MRF model for a system in problem 1 again with potential function,
+\[
+    H(\I(x,y)) = \int\int (\nabla_x \I(x,y))^2 + (\nabla_y \I(x,y))^2 dxdy.
+\]
+This is the so-called functional (H is a function of function $\I$, and $\I$ is a function of position $(x,y)$). 
+
+Suppose we minimize the potential $H(\I)$ by gradient descent. The dynamic of the system state is an image sequence $\I(x,y,t)$ showing the state changes over time, 
+\[    \frac{d \I(x,y,t)}{d t } = - \frac{\delta H(\I(x,y,t))}{\delta
+\I},  \quad \forall x,y.
+\]
+The right side  is the derivative from variational calculus (See hint below).  $t$ is the time step. This leads to a partial differential equations (PDEs) for the system dynamics.
+
+\begin{enumerate}
+\item By variational calculus using the Euler-Lagrange equation,  show
+that the PDE above is the classic {\em heat-diffusion equation}.
+\[
+     \frac{d \I(x,y,t)}{d t} = \Delta \I(x,y), \quad {\rm or} \quad
+     \I_t = \I_{xx}+\I_{yy}.
+\]
+where $\Delta=\frac{\partial^2}{\partial
+x^2}+\frac{\partial^2}{\partial y^2}$ is the Laplacian operator.
+
+\textbf{Answer:}
+with the E-L equation, which is:
+$$
+\frac{\delta E}{\delta f} = \frac{\partial L}{\partial f} - \frac{d}{dx}(\frac{\partial L}{\partial \dot{f}})
+$$
+where
+$$
+E(f(x)) = \int L(f(x),\dot{f(x)})dx
+$$
+Here, we can reform the equation as:
+$$
+\frac{\delta H(\I(x,y,t))}{\delta \I}=\frac{\partial L}{\partial \I} - \nabla(\frac{\partial L}{\partial \nabla \I})
+$$
+where
+$$
+L(\I,\nabla\I)=(\nabla_x \I(x,y))^2 + (\nabla_y \I(x,y))^2
+$$
+so $L$ does not contain $\I$, and thus $\frac{\partial L}{\partial \I}=0$
+$$
+\frac{d\I(x,y,t)}{dt} = \nabla(\frac{\partial L}{\partial \nabla I}) = 2\Delta \I(x,y)
+$$
+
+\item Rewrite the energy $H(\I)$ in discrete form: replace the integral by summation,
+and the gradients by difference $\nabla_x \I(x,y) = \I(x+1,
+y)-\I(x,y)$. The derive the discrete diffusion equation for updating
+$\I(x,y,t)$ using the conventional gradient descent equation.
+\[   \frac{d \I(x,y,t)}{dt} = - \frac{dH(\I(x,y,t))}{d\I}. \]
+
+This actually should be a discrete form of the heat diffusion equation.
+
+\textbf{Answer:}
+
+The new form of $H(\I)$ is like this:
+$$
+H(\I) = \sum_{x = -\infty}^{\infty}\sum_{y = -\infty}^{\infty}(\I(x+1,y)-\I(x,y))^2+(\I(x,y+1)-\I(x,y))^2
+$$
+The form of derivative is like this:
+$$
+\frac{d\I(x,y,t)}{dt} = \sum_{x,y}4\I(x,y)-2\I(x+1,y)-2I(x,y+1)
+$$
+\item Suppose we use periodical boundary condition (torus), what is
+the image $\I(x,y, t)$ as $t \rightarrow \infty$.
+
+\textbf{Answer:}
+Image will be independent of time
+
+ 
+%\item Derive the PDE if the potential has a Total-Variation norm,
+%\[
+%    H(\I(x,y)) = \int\int |\nabla_x \I(x,y)| + |\nabla_y \I(x,y)| dxdy.
+%\]
+
+\end{enumerate}
+
+{\em Remark: if we re-express the function $H$ in the Fourier form as we did in Qestion 1.3.  You can see the other way for minimizing $H$ in the Fourier domain. Actually, Fourier transform was first invented by Joseph Fourier in 1822   to solve the heat diffusion equations.  Read some background in wikipedia. In future lectures, we will see how we learn the potentials in general form and then derive system dynamics in general.}\\
+
+
+{\em  Variational Calculus: Suppose we are minimizing a functional with respect to
+a function $f(x)$
+\[  E(f(x)]  = \int L(f(x), \dot{f}(x))dx \]
+The Euler-Lagrange equation for the minimum is
+\[
+     \frac{\delta E}{\delta f} = \frac{\partial L}{\partial(f)} - \frac{d }{dx}(\frac{\partial L}{\partial \dot{f}}) =0
+\]
+You may find some on-line tutorial on the Euler-Lagrange equation, especially for $f(x)$ that  has multiple variables $x=(x_1, ...,x_n)$.
+In the above question, we treat the image $\I(x,y)$ as a continuous
+function and $H(\I)$ is a functional. In computer vision, the
+variational methods (PDEs) often switch to a continuous domain to
+derive the equations and then switch back to discrete lattice for
+implementation. }
+
+\vspace{0.5cm}
+
+\noindent{\bf Question 3}  (A scale invariant world, 3 points).
+Consider a toy world which consists of only line segments. In an
+image, a line segment is represented by its center $(x_i,y_i)$,
+orientation $\theta_i$ and length $r_i$.  The line segments are
+independently distributed with uniform probability for their centers
+and orientations. The length follows a probability $p(r)$. We denote
+by $\lambda(a,b, A)$ the number of line segments with length $r\in
+[a,b]$ whose center falls inside an area $A$. Note that we assume
+the image is defined on a continuous 2D domain and the line segment
+has zero width (when you down scale the image, the width of the line
+does not change).
+
+When we scale the image by a factor $s$, then the line segment will
+ be scaled from length $r$ to $sr$.  Suppose that the image
+ ensemble is scale invariant, that is, at any scale $s$, within a
+ unit area, we always observe the same number (on average) of line
+ segments with length $r$.
+
+\begin{enumerate}
+\item Show that $\lambda(a,b,A) = 4\lambda(2a,2b,A)$. [Hint: by direct argument].
+
+\textbf{Answer:}
+the three arguments actually specify a region that include the whole part of the lines that should be counted. These lines' center all fall in area A, so the decisive factor are a and b. It's obvious that the size defined by 2a and 2b is 4 times bigger than that by a and b, so the number of them possess the same relation.
+
+\item Use the above equation, then show that for any interval $[a,b]$,
+\[
+     \int_a^b p(r)dr = s^2  \int_{sa}^{sb} p(r)dr.
+\]
+
+\textbf{Answer:}
+with the conclusion in section1, it can be derived that
+$$
+\lambda(a,b,A)=s^2\lambda(sa,sb,A)
+$$
+and since $\lambda$ is the number of lines,
+$$
+\lambda(a,b,A) = \lambda(0,\infty,A)\int_{a}^{b}p(r)dr
+$$
+so
+$$
+\int_a^b p(r)dr = s^2  \int_{sa}^{sb} p(r)dr
+$$
+
+\item Set $a=a_o$ a constant, and $b=r$ a variable, from the above equation
+show $p(r)=s^3 p(sr)$, then $p(r)=\frac{c}{r^3}$.
+
+\textbf{Answer:}
+let $F(r)=\int_{a_o}^{r}p(r)dr$, so $\frac{dF(r)}{dr}=p(r)$
+
+from the section 2 we got
+$$
+F(r)=s^2F(sr)
+$$
+thus
+$$
+p(r) = s^2\frac{dF(sr)}{dr} = s^3\frac{dF(sr)}{dsr}
+$$
+so
+$$
+p(r) = s^3p(sr)
+$$
+\end{enumerate}
+{\em Remark: This question proves that we will see a scale invariant
+world if the length of the line segments follows a distribution
+$C/r^3$! }
+%Suppose we ignore all line segments with $r\leq \epsilon$.
+
+\noindent{\bf Question 4}.
+
+\textbf{Answer:}
+According to Lagrange Mechanics, we have
+$$
+\frac{\mathrm{d}}{\mathrm{d}t}(\frac{\partial L}{\partial \dot{\vec{r}}})-\frac{\partial L}{\partial \vec{r}}=0
+$$
+Since the Lagrangian expression of a free partical is solely function of velocity, we have
+$$
+\frac{\partial L}{\partial \vec{r}}=0
+$$
+considering that 
+$$
+\dot{\vec{r}}=\vec{v}
+$$
+we have
+$$
+\frac{\mathrm{d}}{\mathrm{d}t}(\frac{\partial L}{\partial \dot{\vec{r}}})=\frac{\mathrm{d}}{\mathrm{d}t}(m\vec{v})=0
+$$
+We suppose that the mass is individual from the velocity, so this equation indicates that velocity will not change through time, which is
+$$
+\vec{v}=const
+$$
+
+\textbf{Answer:}
+With external force, Lagrangian should be rewriten as
+$$
+L=T-V=\frac{1}{2}m\vec{v}^2-V
+$$
+Substitute Lagrangian with this expression:
+$$
+m\frac{\mathrm{d}\vec{v}}{\mathrm{d}t}+\frac{\mathrm{d}}{\mathrm{d}t}(\frac{\partial V}{\partial \dot{\vec{r}}})-F=0
+$$
+If force can be defined through potential, then this potential must be conservative, which means that
+$$
+\frac{\partial V}{\partial \dot{\vec{r}}}=0
+$$
+so
+$$
+F=m\frac{\mathrm{d}\vec{v}}{\mathrm{d}t}
+$$
+
+\textbf{Answer:}
+For each partical i:
+$$
+\frac{\mathrm{d}}{\mathrm{d}t}(\frac{\partial L}{\partial \dot{\vec{r_i}}})-\frac{\partial L}{\partial \vec{r_i}}=0
+$$
+sum them up and we get:
+$$
+\frac{\mathrm{d}}{\mathrm{d}t}(\vec{P})-\sum_{i=1}^{n}\frac{\partial L}{\partial \vec{r_i}}=0
+$$
+Considering the conditions provided, momentum won't change through time, so
+$$
+\vec{P}=const
+$$
+and
+$$
+\frac{\mathrm{d}}{\mathrm{d}t}(\vec{P})=\frac{\mathrm{d}}{\mathrm{d}t}(\sum_{i=1}^{n}m_i\vec{v_i})=\sum_{i=1}^{n}m_i\frac{\mathrm{d}\vec{v_i}}{\mathrm{d}t}=0
+$$
+
+\textbf{Answer:}
+$$
+\frac{\mathrm{d}L}{\mathrm{d}t}=\frac{\partial L}{\partial \vec{r}}\dot{\vec{r}}+\frac{\partial L}{\partial \dot{\vec{r}}}\frac{\mathrm{d}\dot{\vec{r}}}{\mathrm{d}t}
+$$
+and the second part is equal to
+$$
+\frac{\partial L}{\partial \dot{\vec{r}}}\frac{\mathrm{d}\dot{\vec{r}}}{\mathrm{d}t}=\frac{\mathrm{d}}{\mathrm{d}t}(\frac{\partial L}{\partial \dot{\vec{r}}}\dot{\vec{r}})-\frac{\mathrm{d}}{\mathrm{d}t}(\frac{\partial L}{\partial \dot{\vec{r}}})\dot{\vec{r}}
+$$
+substitute the second part with Lagrange euqation:
+$$
+\frac{\mathrm{d}L}{\mathrm{d}t}=\frac{\mathrm{d}}{\mathrm{d}t}(\frac{\partial L}{\partial \dot{\vec{r}}}\dot{\vec{r}})
+$$
+which means:
+$$
+\frac{\mathrm{d}}{\mathrm{d}t}(\frac{\partial L}{\partial \dot{\vec{r}}}\dot{\vec{r}}-L)=0
+$$
+By substituting the specific form of Lagrangian, we can obtain
+$$
+\frac{1}{2}m\dot{\vec{r}}^2+V(\vec{r})=const
+$$
+\end{document}
