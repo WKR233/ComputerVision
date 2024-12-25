@@ -160,14 +160,51 @@ Fill the blank part of \texttt{abp.py}. Design your own structure of the generat
 
 (1) Reconstructed images of training images, using the inferred z from training images. Try both the warm-start scheme (running a finite number of steps of Langevin dynamics starting from the current value of $z_i$) and cold-start scheme (running a finite number of steps of Langevin dynamics starting from the fixed prior distribution of the latent factors)
 \\~\\
+\textbf{Report:}
+\begin{figure}
+    \centering
+    \includegraphics[width=.35\linewidth]{images/warm_recon.png}
+    \includegraphics[width=.35\linewidth]{images/cold_recon.png}
+    \caption{Reconstructed Images In Epoch 2000: Left - Warm Start; Right - Cold Start}
+\end{figure}
+
 (2) Randomly generated images, using randomly sampled z.
 \\~\\
+\textbf{Report:}
+\begin{figure}
+    \centering
+    \includegraphics[width=.35\linewidth]{images/warm_sampled.png}
+    \includegraphics[width=.35\linewidth]{images/cold_sampled.png}
+    \caption{Sampled Images In Epoch 2000: Left - Warm Start; Right - Cold Start}
+\end{figure}
+
 (3) Generated images with linearly interpolated latent factors from (-d, d).
 For example, you interpolate 12 points from (-d, d) for each z dimension. Then you
 will get a $12 \times 12$ panel of images. Determine the reasonable range (-d, d), and you should be able to see that tigers slightly change to lions.
 \\~\\
+\textbf{Report:}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/warm_interp.png}
+    \caption{Interpolated Images In Epoch 2000: Warm Start}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/cold_interp.png}
+    \caption{Interpolated Images In Epoch 2000: Cold Start}
+\end{figure}
+
 (4) Plot of loss over iteration.
 \\~\\
+\textbf{Report:}
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{images/warm_stat.png}
+    \includegraphics[width=\linewidth]{images/cold_stat.png}
+    \caption{Plots of loss In Epoch 2000: Top - Warm Start; Bottom - Cold Start}
+\end{figure}
+
 Write a report to show your results. And zip the report with your code.
 
 
