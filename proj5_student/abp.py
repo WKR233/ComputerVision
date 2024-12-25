@@ -231,20 +231,27 @@ def run(args, exp_dir, logger):
         # update latent z via Langevin sampling
         if args.start == 'warm':
             # TODO
+            z = model.sample_langevin(z, data)
             pass
         else:
             # cold
             # TODO
+            z = model.sample_langevin(z_0.clone(), data)
             pass
 
         # update synthesized images
         # TODO, variable named `x_hat`
+        x_hat = model(z)
 
         # compute loss
         # TODO, variable named `loss`
+        loss = 1.0/(2 * args.mse_sigma * args.mse_sigma) *  F.mse_loss(x_hat, data)
         
         # backpropagate and update generator parameters
         # TODO
+        optG.zero_grad()
+        loss.backward()
+        optG.step()
         lr_schedule.step()
 
         # log
@@ -273,10 +280,12 @@ def run(args, exp_dir, logger):
             # random sample
             if args.start == 'warm':
                 # TODO, variable named `z_sampled`
+                z_sampled = model.sample_langevin(z, data).detach()
                 pass
             else:
                 # cold
                 # TODO, variable named `z_sampled`
+                z_sampled = Variable(sample_gaussian_prior(batch_size=batch_size, nz=args.nz, sig=args.prior_sigma))
                 pass
             x_sampled = model(z_sampled)
             save_images(
